@@ -5,7 +5,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import './index.css'
+// import './index.css'
 import Invoices from './Invoices.jsx';
 import InvoiceDetails from './InvoiceDetails.jsx';
 

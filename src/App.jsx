@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import {db} from './firebase/config'
 import { getDocs, collection, addDoc, query, orderBy, limit } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { forms } from './constants/constants';
 
 function App() {
   const currentDate = new Date();
@@ -13,6 +15,12 @@ function App() {
   const [address, setAddress] = useState('');
   const [cc, setCC] = useState('');
   const [documentIdCounter, setDocumentIdCounter] = useState(150);
+  const navigate = useNavigate();
+  const [selectedForm, setSelectedForm] = useState(forms[0]);
+
+  const handleFormChange = (event) => {
+    setSelectedForm(event.target.value);
+  };
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -93,7 +101,9 @@ function App() {
         address,
         cc,
         items,
-        grandTotal
+        grandTotal,
+        createdAt: getDate(),
+        selectedForm,
       }).then(() => {
         setAddress("");
         setCC("");
@@ -108,9 +118,33 @@ function App() {
       console.error("Error adding document: ", error);
     }
   }
+
+  const handleNavigate = () => {
+    navigate('/invoices');
+  }
   return (
     <>
-      <h1>GNT {getDate()}</h1>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+        }}>
+        <h1>GNT {getDate()}</h1>
+        <div>
+          <button onClick={handleNavigate}>Go to Invoices</button>
+        </div>
+      </div>
+      <label htmlFor="formSelect">Select Form:</label>
+      <select id="formSelect" value={selectedForm} onChange={handleFormChange}>
+        <option value="" disabled>Select a form</option>
+        {forms.map((form, index) => (
+          <option key={index} value={form}>
+            {form}
+          </option>
+        ))}
+      </select>
+      <br/>
       <input value={company} type="text" placeholder="Company" onChange={(e) => setCompany(e.target.value)} />
       <br/>
       <br/>

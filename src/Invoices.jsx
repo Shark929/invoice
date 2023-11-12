@@ -33,8 +33,31 @@ const Invoices = () => {
     <div>
       <h1>Invoices</h1>
       {data.map((doc) => (
-        <div key={doc.id} onClick={() => handleClick(doc)}>
-          {doc.data().company}
+        <div key={doc.id} onClick={() => handleClick(doc)} 
+          style={{
+            cursor: 'pointer',
+            color: 'navy',
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+        >
+          <div
+            style={{
+              marginRight: '10px',
+              marginBottom: '10px'
+            }}
+          >
+            {doc.data().company}
+          </div>
+          <div style={{
+              marginRight: '10px',
+              marginBottom: '10px'
+            }}>
+            RM {doc.data().grandTotal}.00
+          </div>
+          <div>
+            {doc.data().selectedForm}
+          </div>
         </div>
       ))}
     </div>
