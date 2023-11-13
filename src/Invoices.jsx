@@ -2,10 +2,12 @@ import {useState, useEffect} from 'react'
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "./firebase/config";
 import { useNavigate } from 'react-router-dom';
+import { forms } from './constants/constants';
 
 const Invoices = () => {
   const [data, setData] = useState([]);
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     // Fetch data from Firebase Firestore
@@ -29,37 +31,85 @@ const Invoices = () => {
     console.log(`Navigating to invoice with Firebase document ID: ${doc.id}`);
   };
 
+  const calculateTotalGrandTotal = () => {
+    // Calculate the total of grandTotal where selectedForm is "INVOICE" or "CASH"
+    return data.reduce((total, doc) => {
+      if (doc.data().selectedForm === forms[1]) {
+        return total + doc.data().grandTotal;
+      }
+      return total;
+    }, 0);
+  };
+
+  const sortedData = [...data].sort((a, b) => {
+    // Assuming `id` is a number; if it's a string, you might need to adjust the comparison
+    return a.data().id - b.data().id;
+  });
+
+  // Filter data based on the search query
+  const filteredData = sortedData.filter((doc) =>
+    doc.data().company.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div>
-      <h1>Invoices</h1>
-      {data.map((doc) => (
-        <div key={doc.id} onClick={() => handleClick(doc)} 
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <button 
           style={{
-            cursor: 'pointer',
-            color: 'navy',
-            display: 'flex',
-            flexDirection: 'row',
+            backgroundColor: '#4DA9FF',
+              border: 'none',
+              borderRadius: '5px',
+              width: '150px',
+              padding: '10px',
+              marginRight: '10px'
           }}
-        >
-          <div
-            style={{
-              marginRight: '10px',
-              marginBottom: '10px'
-            }}
-          >
-            {doc.data().company}
-          </div>
-          <div style={{
-              marginRight: '10px',
-              marginBottom: '10px'
-            }}>
-            RM {doc.data().grandTotal}.00
-          </div>
-          <div>
-            {doc.data().selectedForm}
-          </div>
-        </div>
-      ))}
+          onClick={()=>{navigate('/')}}>
+            Home
+          </button>
+          <p>Total Sales: <h3>RM {calculateTotalGrandTotal()}.00</h3></p>
+        <h1>Documents</h1>
+      </div>
+      
+      <input
+        type="text"
+        placeholder="Search by company..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+      <table style={{ width: '100%', marginTop: '20px', borderCollapse: 'collapse' }}>
+        <thead>
+         <tr>
+            <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>Id</th>
+            <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>Forms</th>
+            <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>Company</th>
+            <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>Grand Total (RM)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredData.map((doc) => (
+            <tr
+              style={{
+                display: doc.data().company.toLowerCase().includes(searchQuery.toLowerCase()) ? 'table-row' : 'none',
+                backgroundColor: doc.data().selectedForm === forms[1] ? 'green' : 'inherit',
+                color: doc.data().selectedForm === forms[1] ? 'white' : 'inherit',
+              }}
+              key={doc.id}
+              onClick={() => handleClick(doc)}
+            >
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>{doc.data().id}</td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>{doc.data().selectedForm}</td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>{doc.data().company}</td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>{doc.data().grandTotal}.00</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }

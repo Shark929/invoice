@@ -8,6 +8,8 @@ import {
 // import './index.css'
 import Invoices from './Invoices.jsx';
 import InvoiceDetails from './InvoiceDetails.jsx';
+import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
 
 const router = createBrowserRouter([
   {
@@ -22,6 +24,14 @@ const router = createBrowserRouter([
   {
     path: "/invoice/:id",
     element: <InvoiceDetails/>
+  },
+  {
+    path: "/login",
+    element: <Login/>
+  },
+  {
+    path: "/register",
+    element: <Register/>
   }
 ]);
 

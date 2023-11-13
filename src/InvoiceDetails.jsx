@@ -7,6 +7,7 @@ import { forms } from './constants/constants';
 const InvoiceDetails = () => {
   const { id } = useParams(); // Get the invoice ID from the URL params
   const [invoiceData, setInvoiceData] = useState(null);
+  // const invoiceRef = useRef(null);
 
   useEffect(() => {
     const fetchInvoiceData = async () => {
@@ -29,9 +30,17 @@ const InvoiceDetails = () => {
 
   return (
     <div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'left',
+        }}
+      >
+      </div>
       {
         invoiceData ? (
-          <div>
+          <div id='pdf'>
             <div
               style={{
                   display:'flex',
@@ -93,7 +102,7 @@ const InvoiceDetails = () => {
                     <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>Total</th>
                   </tr>
                 </thead>
-                <tbody>
+
                   {
                     invoiceData.items.map((item, index) => (
                       <tr key={item.id} style={{ backgroundColor: index % 2 === 0 ? '#cceeff' : 'white' }}>
@@ -104,7 +113,10 @@ const InvoiceDetails = () => {
                       </tr>
                     ))
                   }
-                </tbody>
+                  <tr>
+                    <td colSpan="3" style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}><b>Grand Total</b></td>
+                    <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}><b>{invoiceData.grandTotal}.00</b></td>
+                  </tr>
               </table>
               <div
                 style={{
@@ -137,6 +149,7 @@ const InvoiceDetails = () => {
                 </tbody>
               </table>
             </div>
+            
           </div>
         ) : (<div>Loading...</div>)
       }
