@@ -8,6 +8,8 @@ const Invoices = () => {
   const [data, setData] = useState([]);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     // Fetch data from Firebase Firestore
@@ -51,6 +53,35 @@ const Invoices = () => {
     doc.data().company.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const slicedData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    for (let i = 1; i <= totalPages; i++) {
+      buttons.push(
+        <button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          style={{
+            margin: '0 5px',
+            padding: '5px 10px',
+            backgroundColor: currentPage === i ? '#4DA9FF' : 'inherit',
+            color: currentPage === i ? 'white' : 'inherit',
+            borderRadius: '5px',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          {i}
+        </button>
+      );
+    }
+    return buttons;
+  };
+
   return (
     <div>
       <div
@@ -93,7 +124,7 @@ const Invoices = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredData.map((doc) => (
+          {slicedData.map((doc) => (
             <tr
               style={{
                 display: doc.data().company.toLowerCase().includes(searchQuery.toLowerCase()) ? 'table-row' : 'none',
@@ -111,6 +142,9 @@ const Invoices = () => {
           ))}
         </tbody>
       </table>
+      <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+        {renderPaginationButtons()}
+      </div>
     </div>
   )
 }
