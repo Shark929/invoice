@@ -77,6 +77,7 @@ const Invoices = () => {
       </div>
       
       <input
+        style={{padding: '10px', width: '180px'}} 
         type="text"
         placeholder="Search by company..."
         value={searchQuery}
