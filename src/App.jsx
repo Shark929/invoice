@@ -3,7 +3,7 @@ import './App.css'
 import {db} from './firebase/config'
 import { getDocs, collection, addDoc, query, orderBy, limit } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { forms } from './constants/constants';
+import { forms, options } from './constants/constants';
 import { auth } from './firebase/config';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { useMediaQuery } from 'react-responsive';
@@ -21,8 +21,10 @@ function App() {
   const [documentIdCounter, setDocumentIdCounter] = useState(1);
   const navigate = useNavigate();
   const [selectedForm, setSelectedForm] = useState(forms[0]);
+ 
   const [userId, setUserId] = useState(null);
-
+  const optionsArray = Object.values(options);
+  const [selectedOption, setSelectedOption] = useState('');
   const isDesktopOrLaptop = useMediaQuery({
     query: '(min-width: 1224px)'
   })
@@ -161,6 +163,25 @@ function App() {
     });
   }
 
+  const handleOptionChange = (event) => {
+    const selectedOptionId = event.target.value;
+  const selectedOptionDetails = options.find((option) => option.description === selectedOptionId);
+
+  if (selectedOptionDetails) {
+    // Set values based on the selected option
+    setDescription(selectedOptionDetails.description);
+    setPrice(selectedOptionDetails.price.toString());
+    setQuantity(selectedOptionDetails.quantity.toString());
+    setSelectedOption(selectedOptionDetails);
+  } else {
+    // Clear values if the selected option is not found
+    setDescription("");
+    setPrice("");
+    setQuantity("");
+    setSelectedOption(null);
+  }
+  };
+
   return (
     userId ? <>
       <div
@@ -284,6 +305,32 @@ function App() {
         >
           <label style={{width: isDesktopOrLaptop ? '180px' : '130px', textAlign: 'left'}}>CC</label>
           <input style={{padding: '10px', width: '180px'}} value={cc} type="text" placeholder="CC" onChange={(e) => setCC(e.target.value)} />
+        </div>
+        <br/>
+        <div
+          className='options'
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <label style={{width: isDesktopOrLaptop ? '180px' : '130px', textAlign: 'left'}} htmlFor="options">Options:</label>
+          <select 
+            id="options" 
+            value={selectedOption} 
+            onChange={handleOptionChange}
+            style={{
+              padding: '10px', width: '205px'
+            }}
+          >
+            <option value="" disabled>{optionsArray[0].description}</option>
+            {optionsArray.map((option) => (
+              <option key={option.id} value={option.description}>
+                {option.description}
+              </option>
+            ))}
+          </select>
         </div>
         <br/>
         <form 
